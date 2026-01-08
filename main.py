@@ -14,6 +14,9 @@ def run_pipeline(input_dir):
       df = data_extractor.load_df_from_file()
       print(df)
 
+      cleaner = Transformer(df)
+      df = cleaner.clean_sales_df()
+      print(df)
 if __name__ == '__main__':
    input_dir= 'data/bronze'
    run_pipeline(input_dir)
