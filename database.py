@@ -26,6 +26,7 @@ class DB:
       logger.info(f'Loading {self.file_name} parquet to database')
       try:
          self.conn.execute(f"CREATE OR REPLACE TABLE {self.table_name} AS SELECT * FROM read_parquet('{self.parquet_path}')")
+         self.conn.close()
          logger.info(f'Successfully loaded {self.file_name} parquet to database')
 
       except Exception:
