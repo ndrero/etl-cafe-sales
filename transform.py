@@ -104,5 +104,13 @@ class Transformer:
 
       return df
 
+   @staticmethod
+   def create_gold_df(df: pd.DataFrame):
+      df['transaction_month'] =  pd.to_datetime(df['transaction_date']).dt.month_name()
 
+      df['day_of_the_week'] = pd.to_datetime(df['transaction_date']).dt.dayofweek
+
+      df['day_of_the_week'] = pd.to_datetime(df['transaction_date']).dt.day_name()
+
+      return df
       

@@ -18,4 +18,3 @@ class Extractor:
 if __name__ == '__main__':
    data_extractor = Extractor('data/bronze/cafe_sales.csv')
    df = data_extractor.load_df_from_file()
-   print(df)
