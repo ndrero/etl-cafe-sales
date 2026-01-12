@@ -14,11 +14,11 @@ class Loader:
          raise TypeError('df must be a pandas Dataframe')
 
       logger.info(f'Loading {self.file_name} to parquet')
-      
+
       try:
          os.makedirs(output_dir, exist_ok=True)
          output_path = f'{os.path.join(output_dir, self.file_name)}.parquet'
-         df.to_parquet(output_path)
+         df.to_parquet(output_path, index=False)
 
          logger.info(f'Successfully saved to {output_path}')
          return output_path
