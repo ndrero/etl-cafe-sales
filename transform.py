@@ -1,8 +1,14 @@
 import pandas as pd
 import numpy as np
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Transformer:
    def __init__(self, dataframe : pd.DataFrame):
+      if not isinstance(dataframe, pd.DataFrame):
+         logger.error('dataframe must be a pandas DataFrame')
+         raise TypeError('dataframe must be a pandas DataFrame')
       self.dataframe = dataframe
    
    @staticmethod
@@ -91,26 +97,35 @@ class Transformer:
       return df
 
    def clean_sales_df(self):
+      df = self.dataframe
+      logger.info("Cleaning dataframe | rows=%d cols=%d", df.shape[0], df.shape[1])
+      try:
+         df = self.__clean_df(df)
 
-      df = self.__clean_df(self.dataframe)
+         df = self.__define_flags(df)
 
-      df = self.__define_flags(df)
+         df.replace(['ERROR', 'UNKNOWN'], np.nan, inplace=True)
 
-      df.replace(['ERROR', 'UNKNOWN'], np.nan, inplace=True)
+         df = self.__change_value_types(df)
 
-      df = self.__change_value_types(df)
+         df = self.__infer_values(df)
 
-      df = self.__infer_values(df)
-
-      return df
+         logger.info("Cleaned dataframe | rows=%d cols=%d", df.shape[0], df.shape[1])
+         return df
+      
+      except Exception:
+         logger.exception('Could not clean dataframe')
+         raise
 
    @staticmethod
    def create_gold_df(df: pd.DataFrame):
-      df['transaction_month'] =  pd.to_datetime(df['transaction_date']).dt.month_name()
+      try:
+         df['transaction_month'] =  pd.to_datetime(df['transaction_date']).dt.month_name()
 
-      df['day_of_the_week'] = pd.to_datetime(df['transaction_date']).dt.dayofweek
+         df['day_of_the_week'] = pd.to_datetime(df['transaction_date']).dt.day_name()
 
-      df['day_of_the_week'] = pd.to_datetime(df['transaction_date']).dt.day_name()
-
-      return df
+         return df
       
+      except Exception:
+         logger.exception('Could not create gold dataframe')
+         raise
