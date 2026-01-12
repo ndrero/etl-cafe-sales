@@ -44,7 +44,7 @@ def run_etl(bronze_dir, silver_dir, gold_dir):
          loader = Loader(file)
          loader.load_to_parquet(silver_df, silver_dir)
 
-         gold_df = transfomer.create_gold_df(df)
+         gold_df = transfomer.create_gold_df(silver_df)
          loader.load_to_parquet(gold_df, gold_dir)
 
          db = DB(gold_dir, file)
@@ -55,7 +55,7 @@ def run_etl(bronze_dir, silver_dir, gold_dir):
       except Exception:
          logger.error(f'Failed processing {file}')
          continue
-      
+
 if __name__ == '__main__':
    bronze_dir= 'data/bronze'
    silver_dir = 'data/silver'

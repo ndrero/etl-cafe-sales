@@ -120,9 +120,13 @@ class Transformer:
    @staticmethod
    def create_gold_df(df: pd.DataFrame):
       try:
+         df = df[df['is_error'] == False].copy()
+
          df['transaction_month'] =  pd.to_datetime(df['transaction_date']).dt.month_name()
 
          df['day_of_the_week'] = pd.to_datetime(df['transaction_date']).dt.day_name()
+
+         df.drop(columns=['is_error', 'is_missing'], inplace=True)
 
          return df
       
