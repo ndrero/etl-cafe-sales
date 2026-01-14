@@ -1,111 +1,184 @@
-# Dirty Cafe Sales Dataset
+# Cafe Sales — ETL & Analytics Pipeline
 
-## Overview
-
-This repository contains a synthetic cafe sales dataset inspired by a dataset available on Kaggle. The data was intentionally designed to include common real-world issues such as missing fields, inconsistent formatting, and invalid entries. This makes it a suitable resource for practicing data cleaning, ETL development, and exploratory data analysis.
-
-The dataset simulates 10,000 point-of-sale transactions from a fictional cafe, covering items sold, payment information, locations, and timestamps.
+This project implements a complete **ETL (Extract, Transform, Load)** pipeline for cafe sales data, followed by a **Gold layer** optimized for analytics and a set of **business-focused analyses**.
 
 ---
 
-## File Information
+## Project Goals
 
-* **File:** `dirty_cafe_sales.csv`
-* **Rows:** 10,000
-* **Columns:** 8
-
----
-
-## Column Summary
-
-The dataset includes the following fields:
-
-* **Transaction ID** — A unique identifier for each record.
-* **Item** — The product purchased; some values may be missing or intentionally corrupted.
-* **Quantity** — Number of units bought; may contain invalid values.
-* **Price Per Unit** — Unit price of the item.
-* **Total Spent** — The total amount paid for the transaction.
-* **Payment Method** — Payment type used; includes inconsistent values.
-* **Location** — Where the transaction took place (for example, in-store or takeaway).
-* **Transaction Date** — Date of the sale; some entries may have incorrect or inconsistent formats.
+* Build a structured ETL pipeline (Bronze → Silver → Gold)
+* Clean, normalize, and enrich raw sales data
+* Persist curated datasets as Parquet files
+* Load the Gold layer into DuckDB
+* Enable business and exploratory analysis
+* Apply professional logging and error handling
 
 ---
 
-## Dataset Characteristics
+## Architecture
 
-The data includes a variety of imperfections meant to simulate a real operational environment:
-
-* Missing and null values in multiple columns
-* Inconsistent categories such as `"UNKNOWN"` or `"ERROR"`
-* Occasional mismatches between quantity, unit price, and total paid
-* Dates that may require formatting or validation
-
-Such issues provide opportunities to practice:
-
-* Data validation
-* Outlier detection
-* Type conversion
-* Standardization of categorical data
-* Error handling in ETL processes
-
----
-
-## Menu Items and Expected Price Ranges
-
-To guide quality checks during cleaning, the dataset assumes approximate price ranges for typical cafe items:
-
-| Item     | Typical Price ($) |
-| -------- | ----------------- |
-| Coffee   | ~2.0              |
-| Tea      | ~1.5              |
-| Sandwich | ~4.0              |
-| Salad    | ~5.0              |
-| Cake     | ~3.0              |
-| Cookie   | ~1.0              |
-| Smoothie | ~4.0              |
-| Juice    | ~3.0              |
+```
+Raw CSV (Bronze)
+      ↓
+Extractor
+      ↓
+Transformer (Silver)
+      ↓
+Transformer (Gold)
+      ↓
+Parquet Files
+      ↓
+DuckDB Warehouse
+      ↓
+Analytics & Reporting
+```
 
 ---
 
-## Suggested Cleaning and Preparation Steps
+## Project Structure
 
-Below are general recommendations for working with the dataset:
-
-1. **Handle missing values**
-
-   * Impute numeric fields with statistical measures
-   * Set missing categorical values to `"Unknown"` or an appropriate label
-
-2. **Correct invalid or inconsistent entries**
-
-   * Replace placeholders like `"ERROR"` or `"UNKNOWN"`
-   * Validate quantities and prices
-
-3. **Normalize date information**
-
-   * Convert all timestamps to ISO format
-   * Identify or flag dates that cannot be parsed
-
-4. **Feature engineering (optional)**
-
-   * Extract weekday, month, or hour from the date
-   * Classify transactions by type or location
+```
+project/
+│
+├── extract.py        # Data ingestion
+├── transform.py     # Cleaning, validation, enrichment
+├── load.py          # Parquet persistence
+├── database.py      # DuckDB loading
+├── main.py          # ETL orchestration
+├── analysis.py      # Business & exploratory analysis
+│
+├── data/
+│   ├── bronze/      # Raw CSV files
+│   ├── silver/      # Cleaned datasets
+│   └── gold/        # Analytics-ready datasets
+│
+├── logs/             # Runtime logs (ignored by Git)
+├── analysis.sql      # Business queries
+└── README.md
+```
 
 ---
 
-## Usage
+## Pipeline Layers
 
-The dataset is suitable for:
+### Bronze (Raw)
 
-* Practicing Python data cleaning or ETL scripting
-* Demonstrating notebook-based EDA
-* Testing data pipelines
-* Building feature engineering examples and tutorials
+* Raw CSV ingestion
+* No transformations
+* Preserves original data
+
+### Silver (Cleaned)
+
+* Column normalization
+* Deduplication
+* Type casting
+* Missing value handling
+* Error and missing flags
+* Value inference
+
+### Gold (Analytics)
+
+* Filters invalid rows
+* Business-ready columns
+* Time features (month, weekday)
+* Removes technical flags
+* Optimized for reporting
 
 ---
 
-If you want, I can also generate:
+## Key Business Analyses
 
-* A second README describing your ETL architecture
-* A notebook template for cleaning the dataset
-* A full Python ETL structure using modules and logging
+1. Total revenue
+2. Revenue by month
+3. Revenue by weekday
+4. Top 10 items by revenue
+5. Top 10 items by quantity sold
+6. Average ticket size
+7. Payment method distribution
+8. In-store vs Takeaway comparison
+9. Seasonality by item
+10. Data quality overview
+
+---
+
+## How to Run
+
+### Install dependencies
+
+```bash
+pip install pandas numpy duckdb pyarrow
+```
+
+---
+
+### Run the ETL pipeline
+
+```bash
+python main.py
+```
+
+This will:
+
+* Read raw files from `data/bronze/`
+* Generate Silver and Gold Parquet files
+* Load Gold data into DuckDB
+* Log execution steps
+
+---
+
+### Run the analysis
+
+```bash
+python analysis.py
+```
+
+---
+
+## DuckDB
+
+The Gold layer is loaded into DuckDB for analytical querying.
+
+Database file:
+
+```
+data/warehouse.duckdb
+```
+
+---
+
+## Logging
+
+* Centralized logging configuration
+* Logs stored in `logs/etl.log`
+* Levels: INFO, WARNING, ERROR
+* Full stacktrace on failures
+
+---
+
+## Ignored Files
+
+The following are not versioned:
+
+* Parquet files
+* DuckDB files
+* Logs
+
+See `.gitignore`.
+
+---
+
+## Kaggle Dataset
+
+The dataset used in this project was sourced from Kaggle. It contains dirty cafe sales data suitable for practising data cleaning, transformation, and analytics.
+
+Original dataset link:
+https://www.kaggle.com/datasets/ahmedmohamed2003/cafe-sales-dirty-data-for-cleaning-training/data
+
+---
+
+## Author
+
+Developed as a learning and portfolio project.
+
+---
+
